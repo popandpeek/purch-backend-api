@@ -209,9 +209,15 @@ class VendorSchema(ma.Schema):
     contact_email = ma.Email(required=True)
     phone = ma.String(required=True)
     delivery_days = ma.List(ma.String, required=True)
-    vendor_items = ma.Nested(VendorItem, many=True)
-    vendor_orders = ma.Nested(VendorOrder, many=True)
-    vendor_invoices = ma.Nested(VendorInvoice, many=True)
+    # vendor_items = ma.Nested(VendorItemSchema, many=True)
+    # vendor_orders = ma.Nested(VendorOrderSchema, many=True)
+    # vendor_invoices = ma.Nested(VendorInvoiceSchema, many=True)
+
+
+class ItemClassSchema(ma.Schema):
+    id = ma.Integer(dump_only=True)
+    type = ma.String(required=True)
+    # house_items = ma.Nested(HouseItemSchema, many=True)
 
 
 class VendorItemSchema(ma.Schema):
@@ -226,8 +232,8 @@ class VendorItemSchema(ma.Schema):
     pack_size = ma.Integer(required=True)
     pack_number = ma.Integer(required=True)
     brand_name = ma.String(required=True)
-    vendor_order_items = ma.Nested(VendorOrderItem, many=True)
-    vendor = ma.Nested(Vendor)
+    # vendor_order_items = ma.Nested(VendorOrderItemSchema, many=True)
+    vendor = ma.Nested(VendorSchema)
 
 
 class HouseItemSchema(ma.Schema):
@@ -237,30 +243,24 @@ class HouseItemSchema(ma.Schema):
     active = ma.Boolean(required=True)
     inventory_category = ma.String(required=True)
     measure_unit = ma.String(required=True)
-    house_order_items = ma.Nested(HouseOrderItem, many=True)
-    house_inventory_items = ma.Nested(HouseInventoryItem, many=True)
-    vendor_items = ma.Nested(VendorItem, many=True)
+    # house_order_items = ma.Nested(HouseOrderItemSchema, many=True)
+    # house_inventory_items = ma.Nested(HouseInventoryItemSchema, many=True)
+    vendor_items = ma.Nested(VendorItemSchema, many=True)
     default_vendor_item_id = ma.Integer(required=False)
-    storage_locations = ma.Nested(StorageLocation, many=True)
-
-
-class ItemClassSchema(ma.Schema):
-    id = ma.Integer(dump_only=True)
-    type = ma.String(required=True)
-    house_items = ma.Nested(HouseItem, many=True)
+    # storage_locations = ma.Nested(StorageLocationSchema, many=True)
 
 
 class StorageLocationSchema(ma.Schema):
     id = ma.Integer(dump_only=True)
     name = ma.String(required=True)
     storage_type = ma.String(required=True)
-    house_items = ma.Nested(HouseItem, many=True)
+    house_items = ma.Nested(HouseItemSchema, many=True)
 
 
 class HouseOrderSchema(ma.Schema):
     id = ma.Integer(dump_only=True)
     date = ma.DateTime(required=True)
-    house_order_items = ma.Nested(HouseOrderItem, many=True)
+    # house_order_items = ma.Nested(HouseOrderItemSchema, many=True)
     submitted = ma.Boolean(required=True)
 
 
@@ -269,7 +269,7 @@ class HouseOrderItemSchema(ma.Schema):
     house_item_id = ma.Integer(required=True)
     house_order_id = ma.Integer(required=True)
     quantity = ma.Decimal(required=True)
-    house_order = ma.Nested(HouseOrder)
+    house_order = ma.Nested(HouseOrderSchema)
 
 
 class VendorOrderSchema(ma.Schema):
@@ -278,9 +278,9 @@ class VendorOrderSchema(ma.Schema):
     vendor_invoice_id = ma.Integer(required=True)
     date = ma.DateTime(required=True)
     submitted = ma.Boolean(required=True)
-    vendor_order_items = ma.Nested(VendorOrderItem, many=True)
-    vendor = ma.Nested(Vendor)
-    vendor_invoice = ma.Nested(VendorInvoice)
+    # vendor_order_items = ma.Nested(VendorOrderItemSchema, many=True)
+    vendor = ma.Nested(VendorSchema)
+    # vendor_invoice = ma.Nested(VendorInvoiceSchema)
 
 
 class VendorOrderItemSchema(ma.Schema):
@@ -289,8 +289,8 @@ class VendorOrderItemSchema(ma.Schema):
     vendor_order_id = ma.Integer(required=True)
     price = ma.Decimal(required=True)
     quantity = ma.Decimal(required=True)
-    vendor = ma.Nested(Vendor)
-    vendor_order = ma.Nested(VendorOrder)
+    vendor = ma.Nested(VendorSchema)
+    vendor_order = ma.Nested(VendorOrderSchema)
 
 
 class VendorInvoiceSchema(ma.Schema):
@@ -298,16 +298,16 @@ class VendorInvoiceSchema(ma.Schema):
     vendor_id = ma.Integer(required=True)
     vendor_order_id = ma.Integer(required=True)
     date = ma.DateTime(required=True)
-    # invoice_image = ma.Raw(required=True)
-    vendor = ma.Nested(Vendor)
-    vendor_order = ma.Nested(VendorOrder)
+    invoice_image = ma.Raw(required=True)
+    vendor = ma.Nested(VendorSchema)
+    vendor_order = ma.Nested(VendorOrderSchema)
 
 
 class HouseInventorySchema(ma.Schema):
     id = ma.Integer(dump_only=True)
     date = ma.DateTime(required=True)
     submitted = ma.Boolean(required=True)
-    house_inventory_items = ma.Nested(HouseInventoryItem, many=True)
+    # house_inventory_items = ma.Nested(HouseInventoryItemSchema, many=True)
 
 
 class HouseInventoryItemSchema(ma.Schema):
@@ -318,7 +318,7 @@ class HouseInventoryItemSchema(ma.Schema):
     quantity = ma.Decimal(required=True)
     measure_unit = ma.String(required=True)
     price = ma.Decimal(required=True)
-    house_inventory = ma.Nested(HouseInventory)
+    house_inventory = ma.Nested(HouseInventorySchema)
 
 
 user_schema = UserSchema()

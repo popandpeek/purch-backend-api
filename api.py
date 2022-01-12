@@ -532,7 +532,7 @@ def set_default_vendor_items():
 @api_bp.route('/house_items', methods=['GET'])
 # @jwt_required()
 def house_items():
-    items_list = HouseItem.query.order_by(HouseItem.storage_location, HouseItem.name).all()
+    items_list = HouseItem.query.order_by(HouseItem.name).all()
     if items_list:
         result = house_items_schema.dump(items_list)
         return jsonify(result), 200
@@ -541,9 +541,9 @@ def house_items():
 
 
 @api_bp.route('/order_items', methods=['GET'])
-@jwt_required()
+# @jwt_required()
 def order_items():
-    items_list = HouseItem.query.filter_by(active=True).order_by(HouseItem.storage_location, HouseItem.name).all()
+    items_list = HouseItem.query.filter_by(active=True).order_by(HouseItem.name).all()
     if items_list:
         result = house_items_schema.dump(items_list)
         return jsonify(result), 200
