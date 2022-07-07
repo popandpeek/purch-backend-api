@@ -1,6 +1,5 @@
 from flask import request, jsonify, Blueprint
-from sqlalchemy import DateTime, func
-from model import *
+from src.model import *
 
 blueprint_vendor_items = Blueprint('vendor_items_bp', __name__)
 

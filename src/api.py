@@ -1,8 +1,6 @@
 from flask import request, jsonify, Blueprint
-from flask_jwt_extended import jwt_required, create_access_token
-from extensions import jwt_manager
 from sqlalchemy import DateTime, func
-from model import *
+from src.model import *
 
 api_bp = Blueprint('api_bp', __name__)
 

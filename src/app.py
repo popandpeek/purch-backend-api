@@ -11,11 +11,11 @@ def create_app():
 
 
 def register_extensions(app):
-    from extensions import db
-    from extensions import jwt_manager
+    from src.extensions import db
+    from src.extensions import jwt_manager
     # from extensions import login_manager
-    from extensions import migrate
-    from extensions import ma
+    from src.extensions import migrate
+    from src.extensions import ma
     ma.init_app(app)
     db.init_app(app)
     migrate.init_app(app, db)
