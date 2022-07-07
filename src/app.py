@@ -26,10 +26,26 @@ def register_extensions(app):
 
 
 def register_blueprints(app):
-    from api import api_bp
+    from src.api import api_bp
+    from src.endpoints.blueprint_users import blueprint_users
+    from src.endpoints.blueprint_vendors import blueprint_vendors
+    from src.endpoints.blueprint_vendor_items import blueprint_vendor_items
+    from src.endpoints.blueprint_house_items import blueprint_house_items
+    from src.endpoints.blueprint_house_orders import blueprint_house_orders
+    from src.endpoints.blueprint_inventories import blueprint_inventories
+    from src.endpoints.blueprint_invoices import blueprint_invoices
+    from src.endpoints.blueprint_vendor_orders import blueprint_vendor_orders
     # from webapp import webapp_bp
 
     app.register_blueprint(api_bp)
+    app.register_blueprint(blueprint_users, url_prefix="/api/v1/users")
+    app.register_blueprint(blueprint_vendors, url_prefix="/api/v1/vendors")
+    app.register_blueprint(blueprint_vendor_items, url_prefix="/api/v1/vendor_items")
+    app.register_blueprint(blueprint_house_items, url_prefix="/api/v1/house_items")
+    app.register_blueprint(blueprint_house_orders, url_prefix="/api/v1/house_orders")
+    app.register_blueprint(blueprint_inventories, url_prefix="/api/v1/inventories")
+    app.register_blueprint(blueprint_invoices, url_prefix="/api/v1/invoices")
+    app.register_blueprint(blueprint_vendor_orders, url_prefix="/api/v1/vendor_orders")
     # app.register_blueprint(webapp_bp)
 
 
