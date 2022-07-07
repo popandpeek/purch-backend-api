@@ -1,5 +1,4 @@
-from extensions import db, ma
-from flask_marshmallow import Marshmallow
+from src.extensions import db, ma
 
 house_storage_association_table = db.Table('hs_st_assoc', db.Model.metadata,
                                            db.Column('house_item_id', db.ForeignKey('house_item.id'),
@@ -55,6 +54,7 @@ class ItemClassification(db.Model):
 class VendorItem(db.Model):
     __tablename__ = 'vendor_item'
     id = db.Column(db.Integer, primary_key=True)
+    # active = db.Column(db.Boolean)
     vendor_id = db.Column(db.Integer, db.ForeignKey('vendor.id'))
     house_item_id = db.Column(db.Integer, db.ForeignKey('house_item.id'))
     SKU = db.Column(db.String, nullable=False)
@@ -78,7 +78,6 @@ class HouseItem(db.Model):
     name = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=True)
     active = db.Column(db.Boolean)
-    inventory_category = db.Column(db.String, nullable=False)
     measure_unit = db.Column(db.String, nullable=False)
     item_class = db.relationship('ItemClassification', back_populates='house_items', cascade='all, delete',
                                  foreign_keys=[item_class_id])
@@ -114,6 +113,7 @@ class HouseOrderItem(db.Model):
     house_item_id = db.Column(db.Integer, db.ForeignKey('house_item.id'))
     house_order_id = db.Column(db.Integer, db.ForeignKey('house_order.id'))
     quantity = db.Column(db.Numeric, nullable=False)
+    price = db.Column(db.Decimal, nullable=False)
     house_order = db.relationship('HouseOrder', back_populates='house_order_items', cascade='all, delete',
                                   foreign_keys=[house_order_id])
     house_item = db.relationship('HouseItem', back_populates='house_order_items', cascade='all, delete',
@@ -222,6 +222,7 @@ class ItemClassSchema(ma.Schema):
 
 class VendorItemSchema(ma.Schema):
     id = ma.Integer(dump_only=True)
+    active = ma.Boolean(required=True)
     vendor_id = ma.Integer(required=True)
     house_item_id = ma.Integer(required=True)
     SKU = ma.String(required=True)
@@ -236,31 +237,38 @@ class VendorItemSchema(ma.Schema):
     vendor = ma.Nested(VendorSchema)
 
 
+class StorageLocationSchema(ma.Schema):
+    id = ma.Integer(dump_only=True)
+    name = ma.String(required=True)
+    storage_type = ma.String(required=True)
+    house_items = ma.Nested('HouseItemSchema', many=True)
+
+
 class HouseItemSchema(ma.Schema):
     id = ma.Integer(dump_only=True)
     name = ma.String(required=True)
     description = ma.String(required=True)
     active = ma.Boolean(required=True)
-    inventory_category = ma.String(required=True)
     measure_unit = ma.String(required=True)
-    # house_order_items = ma.Nested(HouseOrderItemSchema, many=True)
-    # house_inventory_items = ma.Nested(HouseInventoryItemSchema, many=True)
     vendor_items = ma.Nested(VendorItemSchema, many=True)
     default_vendor_item_id = ma.Integer(required=False)
-    # storage_locations = ma.Nested(StorageLocationSchema, many=True)
+    storage_locations = ma.Nested(StorageLocationSchema, many=True)
 
 
-class StorageLocationSchema(ma.Schema):
+class StorageLocationHouseItemSchema(ma.Schema):
     id = ma.Integer(dump_only=True)
     name = ma.String(required=True)
-    storage_type = ma.String(required=True)
-    house_items = ma.Nested(HouseItemSchema, many=True)
+    description = ma.String(required=True)
+    active = ma.Boolean(required=True)
+    measure_unit = ma.String(required=True)
+    vendor_items = ma.Nested(VendorItemSchema, many=True)
+    default_vendor_item_id = ma.Integer(required=False)
 
 
 class HouseOrderSchema(ma.Schema):
     id = ma.Integer(dump_only=True)
     date = ma.DateTime(required=True)
-    # house_order_items = ma.Nested(HouseOrderItemSchema, many=True)
+    house_order_items = ma.Nested('HouseOrderItemSchema', many=True)
     submitted = ma.Boolean(required=True)
 
 
@@ -269,7 +277,9 @@ class HouseOrderItemSchema(ma.Schema):
     house_item_id = ma.Integer(required=True)
     house_order_id = ma.Integer(required=True)
     quantity = ma.Decimal(required=True)
-    house_order = ma.Nested(HouseOrderSchema)
+    price = ma.Decimal(reqired=True)
+    house_item = ma.Nested(HouseItemSchema)
+    # house_order = ma.Nested(HouseOrderSchema)
 
 
 class VendorOrderSchema(ma.Schema):
@@ -278,9 +288,9 @@ class VendorOrderSchema(ma.Schema):
     vendor_invoice_id = ma.Integer(required=True)
     date = ma.DateTime(required=True)
     submitted = ma.Boolean(required=True)
-    # vendor_order_items = ma.Nested(VendorOrderItemSchema, many=True)
+    vendor_order_items = ma.Nested('VendorOrderItemSchema', many=True)
     vendor = ma.Nested(VendorSchema)
-    # vendor_invoice = ma.Nested(VendorInvoiceSchema)
+    vendor_invoice = ma.Nested('VendorInvoiceSchema')
 
 
 class VendorOrderItemSchema(ma.Schema):
@@ -307,7 +317,7 @@ class HouseInventorySchema(ma.Schema):
     id = ma.Integer(dump_only=True)
     date = ma.DateTime(required=True)
     submitted = ma.Boolean(required=True)
-    # house_inventory_items = ma.Nested(HouseInventoryItemSchema, many=True)
+    house_inventory_items = ma.Nested('HouseInventoryItemSchema', many=True)
 
 
 class HouseInventoryItemSchema(ma.Schema):
@@ -331,6 +341,7 @@ vendor_items_schema = VendorItemSchema(many=True)
 item_class_schema = ItemClassSchema()
 storage_location_schema = StorageLocationSchema()
 storage_locations_schema = StorageLocationSchema(many=True)
+location_items_schema = StorageLocationHouseItemSchema(many=True)
 house_order_schema = HouseOrderSchema()
 house_orders_schema = HouseOrderSchema(many=True)
 house_order_item_schema = HouseOrderItemSchema()
