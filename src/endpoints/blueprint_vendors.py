@@ -1,6 +1,6 @@
 from flask import jsonify, Blueprint
 from src.model import *
-from src.schema import *
+from src.api_spec import *
 
 
 blueprint_vendors = Blueprint('vendors_bp', __name__)

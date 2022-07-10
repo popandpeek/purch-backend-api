@@ -1,7 +1,7 @@
 from flask import jsonify, Blueprint
 from sqlalchemy import DateTime, func
 from src.model import *
-from src.schema import *
+from src.api_spec import *
 
 
 blueprint_inventories = Blueprint('inventories_bp', __name__)
