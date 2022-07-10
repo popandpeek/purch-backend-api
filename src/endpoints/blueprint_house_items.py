@@ -1,5 +1,7 @@
 from flask import request, jsonify, Blueprint
 from src.model import *
+from src.schema import *
+
 
 blueprint_house_items = Blueprint('house_items_bp', __name__)
 

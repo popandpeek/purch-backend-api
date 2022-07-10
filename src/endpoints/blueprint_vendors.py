@@ -1,5 +1,7 @@
 from flask import jsonify, Blueprint
 from src.model import *
+from src.schema import *
+
 
 blueprint_vendors = Blueprint('vendors_bp', __name__)
 

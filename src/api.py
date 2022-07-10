@@ -2,6 +2,7 @@ from flask import request, jsonify, Blueprint
 from sqlalchemy import DateTime, func
 from src.model import *
 
+
 api_bp = Blueprint('api_bp', __name__)
 
 
