@@ -2,7 +2,7 @@ from flask import request, jsonify, Blueprint
 from flask_jwt_extended import jwt_required, create_access_token
 from src.extensions import jwt_manager
 from src.model import *
-from src.api_spec import *
+from src.schema import *
 
 
 blueprint_users = Blueprint('users_bp', __name__)

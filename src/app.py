@@ -16,9 +16,11 @@ def register_extensions(app):
     # from extensions import login_manager
     from src.extensions import migrate
     from src.extensions import ma
+    from src.extensions import swag
     ma.init_app(app)
     db.init_app(app)
     migrate.init_app(app, db)
+    swag.init_app(app)
 
     jwt_manager.init_app(app)
     # login_manager.init_app(app)
@@ -26,7 +28,8 @@ def register_extensions(app):
 
 
 def register_blueprints(app):
-    from src.api import api_bp
+    from src.extensions import swagger_ui_blueprint, SWAGGER_URL
+    from src.endpoints.blueprint_db import blueprint_db
     from src.endpoints.blueprint_users import blueprint_users
     from src.endpoints.blueprint_vendors import blueprint_vendors
     from src.endpoints.blueprint_vendor_items import blueprint_vendor_items
@@ -35,9 +38,9 @@ def register_blueprints(app):
     from src.endpoints.blueprint_inventories import blueprint_inventories
     from src.endpoints.blueprint_invoices import blueprint_invoices
     from src.endpoints.blueprint_vendor_orders import blueprint_vendor_orders
-    # from webapp import webapp_bp
 
-    app.register_blueprint(api_bp)
+    app.register_blueprint(blueprint_db, url_prefix="/api/db")
+    app.register_blueprint(swagger_ui_blueprint, url_prefix=SWAGGER_URL)
     app.register_blueprint(blueprint_users, url_prefix="/api/v1/users")
     app.register_blueprint(blueprint_vendors, url_prefix="/api/v1/vendors")
     app.register_blueprint(blueprint_vendor_items, url_prefix="/api/v1/vendor_items")
@@ -46,7 +49,6 @@ def register_blueprints(app):
     app.register_blueprint(blueprint_inventories, url_prefix="/api/v1/inventories")
     app.register_blueprint(blueprint_invoices, url_prefix="/api/v1/invoices")
     app.register_blueprint(blueprint_vendor_orders, url_prefix="/api/v1/vendor_orders")
-    # app.register_blueprint(webapp_bp)
 
 
 app = create_app()

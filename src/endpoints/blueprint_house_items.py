@@ -1,14 +1,28 @@
 from flask import request, jsonify, Blueprint
+from http import HTTPStatus
+from flasgger import swag_from
 from src.model import *
-from src.api_spec import *
+from src.schema import *
 
 
 blueprint_house_items = Blueprint('house_items_bp', __name__)
 
 
-@blueprint_house_items.route('/get_items', methods=['GET'])
+@blueprint_house_items.route('/items', methods=['GET'])
+@swag_from({
+    'responses': {
+        HTTPStatus.OK.value: {
+            'description': 'House item GET request',
+            'schema': house_items_schema
+        }
+    }
+})
 # jwt_required
 def house_items():
+    """
+    This endpoint returns a list of all house items
+    :return: json object
+    """
     items = db.session.query(HouseItem).filter(active=True).all()
     if items and items.size() > 0:
         result = house_items_schema.dump(items)
@@ -17,7 +31,15 @@ def house_items():
         return jsonify('No active house items found.'), 404
 
 
-@blueprint_house_items.route('/get_storage_location_items/<int:location_id>', methods=['GET'])
+@blueprint_house_items.route('/storage_location_items/<int:location_id>', methods=['GET'])
+@swag_from({
+    'responses': {
+        HTTPStatus.OK.value: {
+            'description': 'House items in specified storage location GET request',
+            'schema': location_items_schema
+        }
+    }
+})
 # @jwt_required()
 def house_items_storage_location(location_id: int):
     location = db.session.query(StorageLocation).filter_by(id=location_id).one()
@@ -32,7 +54,15 @@ def house_items_storage_location(location_id: int):
         return jsonify('Location not found.'), 404
 
 
-@blueprint_house_items.route('/add_item', methods=['POST'])
+@blueprint_house_items.route('/items', methods=['POST'])
+@swag_from({
+    'responses': {
+        HTTPStatus.OK.value: {
+            'description': 'House item POST request',
+            'schema': house_item_schema
+        }
+    }
+})
 # @jwt_required()
 def add_house_item():
     product_name = request.form['product_name']
@@ -49,11 +79,9 @@ def add_house_item():
         description = request.form['description']
         item_class_name = request.form['item_class_name']
         item_class = db.session.query(ItemClassification).filter_by(type=item_class_name).first()
-        item_class_id = item_class.id
         storage_location_data = db.session.query(StorageLocation).filter_by(name=storage_location).first()
         new_house_item = HouseItem(name=product_name, description=description,
                                    measure_unit=measure_unit, active=active, item_class=item_class)
-        # new_house_item.item_class_id = item_class_id
         if storage_location_data:
             new_house_item.storage_locations.append(storage_location)
         db.session.add(new_house_item)
@@ -62,7 +90,7 @@ def add_house_item():
 
 
 # TODO: update_house_item()'s
-@blueprint_house_items.route('/add_item_storage_location/<int:item_id>/<int:storage_loc>', methods=['PUT'])
+@blueprint_house_items.route('/item_storage_location/<int:item_id>/<int:storage_loc>', methods=['PUT'])
 # @jwt_required()
 def add_house_item_storage_location(house_item_id: int, storage_loc: int):
     item = db.session.query(HouseItem).filter_by(id=house_item_id).first()
@@ -75,7 +103,7 @@ def add_house_item_storage_location(house_item_id: int, storage_loc: int):
         return jsonify('Unable able to add house item to location.'), 404
 
 
-@blueprint_house_items.route('/remove_item/<int:house_item_id>', methods=['PUT'])
+@blueprint_house_items.route('/deactivate_item/<int:house_item_id>', methods=['PUT'])
 # @jwt_required()
 def deactivate_house_item(house_item_id: int):
     item = HouseItem.query.filter_by(id=house_item_id).first()

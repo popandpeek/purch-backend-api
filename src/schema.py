@@ -1,15 +1,4 @@
-from apispec import APISpec
-from apispec.ext.marshmallow import MarshmallowPlugin
-from apispec_webframeworks.flask import FlaskPlugin
 from src.extensions import ma
-
-
-spec = APISpec(
-    title="My App",
-    version="1.0.0",
-    openapi_version="5.2.2",
-    plugins=[FlaskPlugin(), MarshmallowPlugin()],
-)
 
 
 class UserSchema(ma.Schema):
@@ -41,15 +30,15 @@ class VendorSchema(ma.Schema):
     contact_email = ma.Email(required=True)
     phone = ma.String(required=True)
     delivery_days = ma.List(ma.String, required=True)
-    # vendor_items = ma.Nested(VendorItemSchema, many=True)
-    # vendor_orders = ma.Nested(VendorOrderSchema, many=True)
-    # vendor_invoices = ma.Nested(VendorInvoiceSchema, many=True)
+    vendor_items = ma.Nested('VendorItemSchema', many=True)
+    vendor_orders = ma.Nested('VendorOrderSchema', many=True)
+    vendor_invoices = ma.Nested('VendorInvoiceSchema', many=True)
 
 
 class ItemClassSchema(ma.Schema):
     id = ma.Integer(dump_only=True)
     type = ma.String(required=True)
-    # house_items = ma.Nested(HouseItemSchema, many=True)
+    house_items = ma.Nested('HouseItemSchema', many=True)
 
 
 class VendorItemSchema(ma.Schema):
@@ -65,7 +54,7 @@ class VendorItemSchema(ma.Schema):
     pack_size = ma.Integer(required=True)
     pack_number = ma.Integer(required=True)
     brand_name = ma.String(required=True)
-    # vendor_order_items = ma.Nested(VendorOrderItemSchema, many=True)
+    vendor_order_items = ma.Nested('VendorOrderItemSchema', many=True)
     vendor = ma.Nested(VendorSchema)
 
 
@@ -111,7 +100,7 @@ class HouseOrderItemSchema(ma.Schema):
     quantity = ma.Decimal(required=True)
     price = ma.Decimal(reqired=True)
     house_item = ma.Nested(HouseItemSchema)
-    # house_order = ma.Nested(HouseOrderSchema)
+    house_order = ma.Nested(HouseOrderSchema)
 
 
 class VendorOrderSchema(ma.Schema):
@@ -188,18 +177,3 @@ house_inventory_schema = HouseInventorySchema()
 house_inventorys_schema = HouseInventorySchema(many=True)
 house_inventory_item_schema = HouseInventoryItemSchema()
 house_inventory_items_schema = HouseInventoryItemSchema(many=True)
-
-spec.components.schema("Input", schema=UserSchema)
-spec.components.schema("Output", schema=HouseInventorySchema)
-spec.components.schema("Output", schema=HouseInventoryItemSchema)
-spec.components.schema("Output", schema=HouseItemSchema)
-spec.components.schema("Output", schema=HouseOrderSchema)
-spec.components.schema("Output", schema=HouseOrderItemSchema)
-spec.components.schema("Output", schema=StorageLocationHouseItemSchema)
-spec.components.schema("Output", schema=VendorSchema)
-spec.components.schema("Output", schema=VendorItemSchema)
-spec.components.schema("Output", schema=VendorInvoiceSchema)
-spec.components.schema("Output", schema=VendorOrderItemSchema)
-spec.components.schema("Output", schema=VendorOrderSchema)
-spec.components.schema("Output", schema=ItemClassSchema)
-spec.components.schema("Output", schema=StorageLocationSchema)

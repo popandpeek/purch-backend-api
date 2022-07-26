@@ -1,13 +1,13 @@
 from flask import jsonify, Blueprint
 from sqlalchemy import DateTime, func
 from src.model import *
-from src.api_spec import *
+from src.schema import *
 
 
 blueprint_inventories = Blueprint('inventories_bp', __name__)
 
 
-@blueprint_inventories.route('/get_inventory/<int:inventory_id>', methods=['GET'])
+@blueprint_inventories.route('/inventory/<int:inventory_id>', methods=['GET'])
 # @jwt_required()
 def house_inventory(inventory_id: int):
     inventory = HouseInventory.query.filter_by(HouseInventory.id == inventory_id)
@@ -18,7 +18,7 @@ def house_inventory(inventory_id: int):
         return jsonify('No inventory found'), 404
 
 
-@blueprint_inventories.route('/get_inventories', methods=['GET'])
+@blueprint_inventories.route('/inventories', methods=['GET'])
 # @jwt_required()
 def house_inventories():
     inventories = HouseInventory.query.order_by(HouseInventory.date).all()
@@ -30,7 +30,7 @@ def house_inventories():
 
 
 # TODO: Need to order by storage_location, item_class, and name
-@blueprint_inventories.route('/get_inventory_items/<int:inventory_id>', methods=['GET'])
+@blueprint_inventories.route('/inventory_items/<int:inventory_id>', methods=['GET'])
 # @jwt_required()
 def house_inventory_items(inventory_id: int):
     inventory_items = HouseInventoryItem.query.filter_by(HouseInventoryItem.house_inventory_id == inventory_id).all()
@@ -41,7 +41,7 @@ def house_inventory_items(inventory_id: int):
         return jsonify('No inventory items found!'), 404
 
 
-@blueprint_inventories.route('/get_active_inventory', methods=['GET'])
+@blueprint_inventories.route('/active_inventory', methods=['GET'])
 # @jwt_required()
 def active_inventory():
     inventory = HouseInventory.query.filter_by(HouseInventory.submitted is False).first()
@@ -64,7 +64,7 @@ def active_inventory():
         return jsonify(result), 200
 
 
-@blueprint_inventories.route('/update_inventory_item_price/<int:inventory_item_id>/<string:price>', methods=['PUT'])
+@blueprint_inventories.route('/inventory_item_price/<int:inventory_item_id>/<string:price>', methods=['PUT'])
 # @jwt_required()
 def update_inventory_item_price(inventory_item_id: int, price: str):
     item = HouseOrderItem.query.filter_by(id=inventory_item_id).first()
@@ -76,7 +76,7 @@ def update_inventory_item_price(inventory_item_id: int, price: str):
         return jsonify('Vendor item not found.'), 404
 
 
-@blueprint_inventories.route('/update_inventory_item_quantity/<int:inventory_item_id>/<int:quantity>', methods=['PUT'])
+@blueprint_inventories.route('/inventory_item_quantity/<int:inventory_item_id>/<int:quantity>', methods=['PUT'])
 # @jwt_required()
 def update_inventory_item_quantity(inventory_item_id: int, quantity: int):
     item = HouseOrderItem.query.filter_by(id=inventory_item_id).first()

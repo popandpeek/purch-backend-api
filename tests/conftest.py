@@ -2,7 +2,7 @@ import pytest
 import os
 
 
-def pytest_addoption(parser):
+def pytest_adoption(parser):
     # ability to test API on different hosts
     parser.addoption("--host", action="store", default="http://localhost:5000")
 

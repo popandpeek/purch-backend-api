@@ -1,12 +1,12 @@
 from flask import jsonify, Blueprint
 from src.model import *
-from src.api_spec import *
+from src.schema import *
 
 
 blueprint_vendor_orders = Blueprint('house_vendor_bp', __name__)
 
 
-@blueprint_vendor_orders.route('/get_orders/<int:vendor_id>', methods=['GET'])
+@blueprint_vendor_orders.route('/orders/<int:vendor_id>', methods=['GET'])
 # @jwt_required()
 def vendor_orders(vendor_id: int):
     orders = VendorOrder.query.filter_by(VendorOrder.vendor_id == vendor_id).order_by(VendorOrder.date).all()

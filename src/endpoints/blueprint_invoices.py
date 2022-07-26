@@ -1,12 +1,12 @@
 from flask import request, jsonify, Blueprint
 from src.model import *
-from src.api_spec import *
+from src.schema import *
 
 
 blueprint_invoices = Blueprint('house_invoices', __name__)
 
 
-@blueprint_invoices.route('/get_invoices/<int:vendor_id>', methods=['GET'])
+@blueprint_invoices.route('/invoices/<int:vendor_id>', methods=['GET'])
 # @jwt_required()
 def vendor_invoices(vendor_id: int):
     invoices = VendorInvoice.query.filter_by(VendorInvoice.vendor_id == vendor_id).order_by(VendorInvoice.date)
@@ -18,7 +18,7 @@ def vendor_invoices(vendor_id: int):
 
 
 # TODO: add_vendor_invoice(): takes in vendor_id and invoice file, creates vendor_invoice object
-@blueprint_invoices.route('/add_invoice', methods=['POST'])
+@blueprint_invoices.route('/invoices', methods=['POST'])
 # @jwt_required()
 def add_vendor_invoice():
     vendor_id = request.form['vendor_id']

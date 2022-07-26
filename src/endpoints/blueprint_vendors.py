@@ -1,12 +1,12 @@
 from flask import jsonify, Blueprint
 from src.model import *
-from src.api_spec import *
+from src.schema import *
 
 
 blueprint_vendors = Blueprint('vendors_bp', __name__)
 
 
-@blueprint_vendors.route('/get_vendors', methods=['GET'])
+@blueprint_vendors.route('/vendors', methods=['GET'])
 # @jwt_required()
 def vendors():
     vendor_objs = Vendor.query.all()

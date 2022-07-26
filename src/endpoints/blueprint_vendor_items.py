@@ -1,12 +1,12 @@
 from flask import request, jsonify, Blueprint
 from src.model import *
-from src.api_spec import *
+from src.schema import *
 
 
 blueprint_vendor_items = Blueprint('vendor_items_bp', __name__)
 
 
-@blueprint_vendor_items.route('/get_items/<int:vendor_id>', methods=['GET'])
+@blueprint_vendor_items.route('/items/<int:vendor_id>', methods=['GET'])
 # @jwt_required()
 def vendor_items(vendor_id: int):
     vendor = Vendor.query.filter_by(id=vendor_id).first()
@@ -17,7 +17,7 @@ def vendor_items(vendor_id: int):
         return jsonify('No vendor items found.'), 404
 
 
-@blueprint_vendor_items.route('/add_item', methods=['POST'])
+@blueprint_vendor_items.route('/items', methods=['POST'])
 # @jwt_required()
 def add_vendor_item():
     vendor_id = request.form['vendor_id']
@@ -57,7 +57,7 @@ def set_default_vendor_item_helper(house_item_id):
         return jsonify('House item not found.'), 404
 
 
-@blueprint_vendor_items.route('/set_default_item/<int:house_item_id>', methods=['PUT'])
+@blueprint_vendor_items.route('/default_items/<int:house_item_id>', methods=['PUT'])
 # @jwt_required()
 def set_default_vendor_item(house_item_id: int):
     item = HouseItem.query.filter_by(id=house_item_id).first()
@@ -69,7 +69,7 @@ def set_default_vendor_item(house_item_id: int):
         return jsonify('House item not found. Default vendor item not set.'), 404
 
 
-@blueprint_vendor_items.route('/set_default_items', methods=['PUT'])
+@blueprint_vendor_items.route('/default_items', methods=['PUT'])
 # @jwt_required()
 def set_default_vendor_items():
     items = HouseItem.query.all()
@@ -82,7 +82,7 @@ def set_default_vendor_items():
         return jsonify('No house items found.'), 404
 
 
-@blueprint_vendor_items.route('/remove_item/<int:vendor_item_id>/', methods=['PUT'])
+@blueprint_vendor_items.route('/deactivate_item/<int:vendor_item_id>/', methods=['PUT'])
 # @jwt_required()
 def deactivate_vendor_item(vendor_item_id: int):
     item = VendorItem.query.filter_by(id=vendor_item_id).first()
