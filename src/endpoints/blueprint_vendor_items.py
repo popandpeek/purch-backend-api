@@ -1,4 +1,4 @@
-from flask import request, jsonify, Blueprint
+from flask import request, jsonify, Blueprint, json
 from src.model import *
 from src.schema import *
 
@@ -11,8 +11,8 @@ blueprint_vendor_items = Blueprint('vendor_items_bp', __name__)
 def vendor_items(vendor_id: int):
     vendor = Vendor.query.filter_by(id=vendor_id).first()
     if vendor:
-        result = vendor_items_schema.dump(vendor.vendor_items)
-        return jsonify(result), 200
+        result = vendor_items_schema.dumps(vendor.vendor_items)
+        return jsonify(json.loads(result)), 200
     else:
         return jsonify('No vendor items found.'), 404
 

@@ -54,10 +54,10 @@ class ItemClassification(db.Model):
 class VendorItem(db.Model):
     __tablename__ = 'vendor_item'
     id = db.Column(db.Integer, primary_key=True)
-    # active = db.Column(db.Boolean)
+    active = db.Column(db.Boolean)
     vendor_id = db.Column(db.Integer, db.ForeignKey('vendor.id'))
     house_item_id = db.Column(db.Integer, db.ForeignKey('house_item.id'))
-    SKU = db.Column(db.String, nullable=False)
+    vendor_SKU = db.Column(db.String, nullable=False)
     vendor_product_id = db.Column(db.Integer, nullable=False)
     product_name = db.Column(db.String, nullable=False)
     description = db.Column(db.String)
@@ -69,6 +69,7 @@ class VendorItem(db.Model):
     vendor = db.relationship('Vendor', back_populates='vendor_items', cascade='all, delete', foreign_keys=[vendor_id])
     house_item = db.relationship('HouseItem', back_populates='vendor_items', cascade='all, delete',
                                  foreign_keys=[house_item_id])
+    vendor_invoice_items = db.relationship('VendorInvoiceItem', back_populates='vendor_item', cascade='all, delete')
 
 
 class HouseItem(db.Model):
@@ -105,6 +106,7 @@ class HouseOrder(db.Model):
     date = db.Column(db.DateTime, nullable=False)
     submitted = db.Column(db.Boolean)
     house_order_items = db.relationship('HouseOrderItem', back_populates='house_order', cascade='all, delete')
+    user_id = db.Column(db.Integer, nullable=True)
 
 
 class HouseOrderItem(db.Model):
@@ -112,13 +114,14 @@ class HouseOrderItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     house_item_id = db.Column(db.Integer, db.ForeignKey('house_item.id'))
     house_order_id = db.Column(db.Integer, db.ForeignKey('house_order.id'))
-    quantity = db.Column(db.Numeric, nullable=False)
-    price = db.Column(db.Numeric, nullable=False)
+    quantity = db.Column(db.String, nullable=False)
+    measure_unit = db.Column(db.String, nullable=False)
+    price = db.Column(db.String, nullable=True)
     house_order = db.relationship('HouseOrder', back_populates='house_order_items', cascade='all, delete',
                                   foreign_keys=[house_order_id])
     house_item = db.relationship('HouseItem', back_populates='house_order_items', cascade='all, delete',
                                  foreign_keys=[house_item_id])
-
+    vendor_order_item = db.relationship('VendorOrderItem', back_populates='house_order_item', uselist=False, cascade='all, delete')
 
 class VendorOrder(db.Model):
     __tablename__ = 'vendor_order'
@@ -128,7 +131,7 @@ class VendorOrder(db.Model):
     submitted = db.Column(db.Boolean)
     vendor = db.relationship('Vendor', back_populates='vendor_orders', foreign_keys=[vendor_id],
                              cascade='all, delete')
-    vendor_invoice = db.relationship('VendorInvoice', back_populates='vendor_order', cascade='all, delete')
+    vendor_invoice = db.relationship('VendorInvoice', back_populates='vendor_order', cascade='all, delete', uselist=False)
     vendor_order_items = db.relationship('VendorOrderItem', back_populates='vendor_order', cascade='all, delete')
 
 
@@ -137,13 +140,16 @@ class VendorOrderItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     vendor_item_id = db.Column(db.Integer, db.ForeignKey('vendor_item.id'))
     vendor_order_id = db.Column(db.Integer, db.ForeignKey('vendor_order.id'))
-    price = db.Column(db.Numeric, nullable=False)
-    quantity = db.Column(db.Numeric, nullable=False)
+    house_order_item_id = db.Column(db.Integer, db.ForeignKey('house_order_item.id'))
+    price = db.Column(db.String, nullable=False)
+    quantity = db.Column(db.String, nullable=False)
+    measure_unit = db.Column(db.String, nullable=False)
     vendor_item = db.relationship('VendorItem', back_populates='vendor_order_items', foreign_keys=[vendor_item_id],
                                   cascade='all, delete')
     vendor_order = db.relationship('VendorOrder', back_populates='vendor_order_items', foreign_keys=[vendor_order_id],
                                    cascade='all, delete')
-
+    vendor_invoice_item = db.relationship('VendorInvoiceItem', back_populates='vendor_order_item', cascade='all, delete', uselist=False)
+    house_order_item = db.relationship('HouseOrderItem', back_populates='vendor_order_item', cascade='all, delete')
 
 class VendorInvoice(db.Model):
     __tablename__ = 'vendor_invoice'
@@ -151,12 +157,30 @@ class VendorInvoice(db.Model):
     vendor_id = db.Column(db.Integer, db.ForeignKey('vendor.id'))
     vendor_order_id = db.Column(db.Integer, db.ForeignKey('vendor_order.id'))
     date = db.Column(db.DateTime, nullable=False)
-    vendor_order = db.relationship('VendorOrder', back_populates='vendor_invoice', uselist=False,
-                                   foreign_keys=[vendor_order_id], cascade='all, delete')
+    paid = db.Column(db.Boolean, nullable=False)
+    invoice_image = db.Column(db.Text, nullable=True)
     vendor = db.relationship('Vendor', back_populates='vendor_invoices', cascade='all, delete', foreign_keys=[vendor_id])
-    # invoice_image = db.Column(db.RAW)
+    vendor_order = db.relationship('VendorOrder', back_populates='vendor_invoice', cascade='all, delete')
+    vendor_invoice_items = db.relationship('VendorInvoiceItem', back_populates='vendor_invoice', cascade='all, delete')
 
 
+class VendorInvoiceItem(db.Model):
+    __tablename__ = 'vendor_invoice_item'
+    id = db.Column(db.Integer, primary_key=True)
+    vendor_invoice_id = db.Column(db.Integer, db.ForeignKey('vendor_invoice.id'))
+    vendor_order_item_id = db.Column(db.Integer, db.ForeignKey('vendor_order_item.id'))
+    vendor_item_id = db.Column(db.Integer, db.ForeignKey('vendor_item.id'))
+    measure_unit = db.Column(db.String, nullable=False)
+    pack_size = db.Column(db.String, nullable=False)
+    pack_number = db.Column(db.String, nullable=False)
+    price = db.Column(db.String, nullable=False)
+    quantity = db.Column(db.String, nullable=False)
+    vendor_invoice = db.relationship('VendorInvoice', back_populates='vendor_invoice_items', cascade='all, delete',
+                                     foreign_keys=[vendor_invoice_id])
+    vendor_order_item = db.relationship('VendorOrderItem', back_populates='vendor_invoice_item', cascade='all, delete',
+                                   foreign_keys=[vendor_order_item_id])
+    vendor_item = db.relationship('VendorItem', back_populates='vendor_invoice_items', cascade='all, delete',
+                                  foreign_keys=[vendor_item_id])
 class HouseInventory(db.Model):
     __tablename__ = 'house_inventory'
     id = db.Column(db.Integer, primary_key=True)
@@ -171,9 +195,9 @@ class HouseInventoryItem(db.Model):
     house_item_id = db.Column(db.Integer, db.ForeignKey('house_item.id'))
     house_inventory_id = db.Column(db.Integer, db.ForeignKey('house_inventory.id'))
     date = db.Column(db.DateTime, nullable=False)
-    quantity = db.Column(db.Numeric, nullable=False)
+    quantity = db.Column(db.String, nullable=False)
     measure_unit = db.Column(db.String, nullable=False)
-    price = db.Column(db.Numeric, nullable=False)
+    price = db.Column(db.String, nullable=False)
     house_item = db.relationship('HouseItem', back_populates='house_inventory_items', cascade='all, delete',
                                  foreign_keys=[house_item_id])
     house_inventory = db.relationship('HouseInventory', back_populates='house_inventory_items', cascade='all, delete',

@@ -1,4 +1,4 @@
-from flask import jsonify, Blueprint
+from flask import jsonify, Blueprint, json
 from sqlalchemy import DateTime, func
 from src.model import *
 from src.schema import *
@@ -21,11 +21,11 @@ def house_orders():
 @blueprint_house_orders.route('/order_items/<int:order_id>', methods=['GET'])
 # @jwt_required()
 def order_items(order_id: int):
-    items_list = HouseOrderItem.query.filter_by(HouseOrderItem.house_order_id == order_id). \
-        order_by(HouseOrderItem.house_item.name).all()
+    order = HouseOrder.query.filter(HouseOrder.id == order_id).one()
+    items_list = order.house_order_items
     if items_list:
-        result = house_order_items_schema.dump(items_list)
-        return jsonify(result), 200
+        result = house_order_items_schema.dumps(items_list)
+        return jsonify(json.loads(result)), 200
     else:
         return jsonify('No order items found.'), 404
 
@@ -36,7 +36,7 @@ def active_order():
     order = HouseOrder.query.filter_by(HouseOrder.submitted is False).first()
     if order:
         item_list = HouseOrderItem.query.filter_by(HouseOrderItem.house_order_id == order.id).all()
-        result = house_order_items_schema.dump(item_list)
+        result = house_order_items_schema.dumps(json.loads(item_list))
         return jsonify(result), 200
     else:
         # create new set of house_order_items from active house_items
@@ -49,7 +49,7 @@ def active_order():
 
         db.session.commit()
         item_list = HouseOrderItem.query.filter_by(HouseOrderItem.house_order_id == order.id).all()
-        result = house_order_items_schema.dump(item_list)
+        result = house_order_items_schema.dumps(json.loads(item_list))
         return jsonify(result), 200
 
 

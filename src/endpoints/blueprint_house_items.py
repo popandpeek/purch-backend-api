@@ -1,8 +1,8 @@
-from flask import request, jsonify, Blueprint
+from flask import request, jsonify, Blueprint, json
 from http import HTTPStatus
 from flasgger import swag_from
 from src.model import *
-from src.schema import *
+from src.schema import HouseItemSchema, house_items_schema, StorageLocationSchema
 
 
 blueprint_house_items = Blueprint('house_items_bp', __name__)
@@ -13,7 +13,7 @@ blueprint_house_items = Blueprint('house_items_bp', __name__)
     'responses': {
         HTTPStatus.OK.value: {
             'description': 'House item GET request',
-            'schema': house_items_schema
+            'schema': HouseItemSchema
         }
     }
 })
@@ -23,10 +23,10 @@ def house_items():
     This endpoint returns a list of all house items
     :return: json object
     """
-    items = db.session.query(HouseItem).filter(active=True).all()
-    if items and items.size() > 0:
-        result = house_items_schema.dump(items)
-        return jsonify(result), 200
+    items = db.session.query(HouseItem).filter_by(active=True).all()
+    if items is not None:
+        result = house_items_schema.dumps(items)
+        return jsonify(json.loads(result)), 200
     else:
         return jsonify('No active house items found.'), 404
 
@@ -36,7 +36,7 @@ def house_items():
     'responses': {
         HTTPStatus.OK.value: {
             'description': 'House items in specified storage location GET request',
-            'schema': location_items_schema
+            'schema': StorageLocationSchema
         }
     }
 })
@@ -45,7 +45,7 @@ def house_items_storage_location(location_id: int):
     location = db.session.query(StorageLocation).filter_by(id=location_id).one()
     if location:
         if location.house_items:
-            result = location_items_schema.dump(location.house_items)
+            result = StorageLocationSchema.dumps(json.loads(location.house_items))
             return jsonify(result), 200
         else:
             return jsonify('No items for location found.'), 404
@@ -59,7 +59,7 @@ def house_items_storage_location(location_id: int):
     'responses': {
         HTTPStatus.OK.value: {
             'description': 'House item POST request',
-            'schema': house_item_schema
+            'schema': HouseItemSchema
         }
     }
 })

@@ -1,3 +1,5 @@
+import datetime
+
 from flask import request, jsonify, Blueprint
 from sqlalchemy import DateTime, func
 from src.model import *
@@ -77,43 +79,45 @@ def db_seed():
     v_order_item1 = VendorOrderItem(
         price='0.55',
         quantity='40',
+        measure_unit='pound'
     )
     v_order_item2 = VendorOrderItem(
         price='0.82',
         quantity='40',
+        measure_unit='pound'
     )
     v_order_item3 = VendorOrderItem(
         price='0.54',
         quantity='80',
-    )
-    v_order_item4 = VendorOrderItem(
-        price='0.73',
-        quantity='80',
+        measure_unit='pound'
     )
 
     # HOUSE_ORDER_ITEMS
     order_item1 = HouseOrderItem(
         quantity='40',
+        measure_unit='pound',
+        vendor_order_item=v_order_item1
     )
     order_item2 = HouseOrderItem(
         quantity='40',
+        measure_unit='pound',
+        vendor_order_item=v_order_item2
     )
     order_item3 = HouseOrderItem(
         quantity='80',
-    )
-    order_item4 = HouseOrderItem(
-        quantity='80',
+        measure_unit='pound',
+        vendor_order_item=v_order_item3
     )
 
     # HOUSE INVENTORY ITEMS
     house_inventory_item1 = HouseInventoryItem(
-        date=DateTime.DateTime(2020, 9, 30),
+        date=datetime.datetime(2020, 9, 30),
         quantity='27',
         measure_unit='pound',
         price='0.65',
     )
     house_inventory_item2 = HouseInventoryItem(
-        date=DateTime.DateTime(2020, 9, 30),
+        date=datetime.datetime(2020, 9, 30),
         quantity='12',
         measure_unit='pound',
         price='0.78',
@@ -121,36 +125,36 @@ def db_seed():
 
     # HOUSE ORDERS
     order1 = HouseOrder(
-        date=DateTime.DateTime(2020, 9, 18),
+        date=datetime.datetime(2020, 9, 18),
         submitted=True,
         house_order_items=[order_item1, order_item2]
     )
     order2 = HouseOrder(
-        date=DateTime.DateTime(2020, 9, 28),
+        date=datetime.datetime(2020, 9, 28),
         submitted=True,
-        house_order_items=[order_item3, order_item4]
+        house_order_items=[order_item3]
     )
 
     # VENDOR ORDERS
     vendor_order1 = VendorOrder(
-        date=DateTime.DateTime(2020, 9, 18),
+        date=datetime.datetime(2020, 9, 18),
         submitted=True,
         vendor_order_items=[v_order_item1],
     )
     vendor_order2 = VendorOrder(
-        date=DateTime.DateTime(2020, 9, 18),
+        date=datetime.datetime(2020, 9, 18),
         submitted=True,
         vendor_order_items=[v_order_item2],
     )
     vendor_order3 = VendorOrder(
-        date=DateTime.DateTime(2020, 9, 28),
+        date=datetime.datetime(2020, 9, 28),
         submitted=True,
-        vendor_order_items=[v_order_item3, v_order_item4],
+        vendor_order_items=[v_order_item3],
     )
 
     # HOUSE INVENTORIES
     house_inventory = HouseInventory(
-        date=DateTime.DateTime(2020, 9, 30),
+        date=datetime.datetime(2020, 9, 30),
         submitted=True,
         house_inventory_items=[house_inventory_item1, house_inventory_item2]
     )
@@ -193,56 +197,82 @@ def db_seed():
         type='freezer_goods'
     )
 
+    # VENDOR INVOICE ITEMS
+    vendor_inv_item1 = VendorInvoiceItem(
+        measure_unit='pound',
+        pack_size=40,
+        pack_number=1,
+        price='0.55',
+        quantity='40'
+    )
+    vendor_inv_item2 = VendorInvoiceItem(
+        measure_unit='pound',
+        pack_size=1,
+        pack_number=40,
+        price='0.82',
+        quantity='40'
+    )
+    vendor_inv_item3 = VendorInvoiceItem(
+        measure_unit='pound',
+        pack_size=40,
+        pack_number=1,
+        price='80',
+        quantity='0.54'
+    )
+
     # VENDOR INVOICES
     vendor_invoice1 = VendorInvoice(
-        date=DateTime.DateTime(2020, 9, 18),
-        vendor_order=vendor_order1
+        date=datetime.datetime(2020, 9, 18),
+        vendor_order=vendor_order1,
+        vendor_invoice_items=[vendor_inv_item1, vendor_inv_item2],
+        paid=False
     )
     vendor_invoice2 = VendorInvoice(
-        date=DateTime.DateTime(2020, 9, 18),
-        vendor_order=vendor_order2
-    )
-    vendor_invoice3 = VendorInvoice(
-        date=DateTime.DateTime(2020, 9, 28),
-        vendor_order=vendor_order3
+        date=datetime.datetime(2020, 9, 18),
+        vendor_order=vendor_order2,
+        vendor_invoice_items=[vendor_inv_item3],
+        paid=False
     )
 
     # VENDOR ITEMS
     carrots_vendor1 = VendorItem(
-        SKU='444465354654',
+        vendor_SKU='444465354654',
         active=True,
         vendor_product_id=123,
         product_name='Carrots, raw',
         description='Bulk carrots, 40#',
-        measure_unit='pounds',
+        measure_unit='pound',
         pack_size=40,
         pack_number=1,
         brand_name='Thumper',
-        vendor_order_items=[v_order_item3]
+        vendor_order_items=[v_order_item3],
+        vendor_invoice_items=[vendor_inv_item3]
     )
     potato_vendor = VendorItem(
-        SKU='5630785467',
+        vendor_SKU='5630785467',
         active=True,
         vendor_product_id=8765,
         product_name='Potatoes, #2',
         description='Best bakers',
-        measure_unit='case',
+        measure_unit='pound',
         pack_size=1,
         pack_number=40,
         brand_name='Idaho Spuds',
-        vendor_order_items=[v_order_item2, v_order_item4]
+        vendor_order_items=[v_order_item2],
+        vendor_invoice_items=[vendor_inv_item2]
     )
     carrots_vendor2 = VendorItem(
-        SKU='63645689453',
+        vendor_SKU='63645689453',
         active=True,
         vendor_product_id=132,
         product_name='Carrots, raw',
         description='Bulk carrots, 40#',
-        measure_unit='pounds',
+        measure_unit='pound',
         pack_size=40,
         pack_number=1,
         brand_name='Sunshine',
-        vendor_order_items=[v_order_item1]
+        vendor_order_items=[v_order_item1],
+        vendor_invoice_items=[vendor_inv_item1]
     )
 
     # HOUSE ITEMS
@@ -250,12 +280,11 @@ def db_seed():
         name='carrots, raw, bulk',
         description='Carrots, bulk',
         active=True,
-        inventory_category='produce',
-        measure_unit='case',
+        measure_unit='pound',
         house_order_items=[order_item1, order_item3],
         house_inventory_items=[house_inventory_item1],
         vendor_items=[carrots_vendor1, carrots_vendor2],
-        # default_vendor_item_id='',
+        default_vendor_item_id=None,
         storage_locations=[kitchen_dry_storage],
         item_class=produce
     )
@@ -263,12 +292,11 @@ def db_seed():
         name='potato, #2, raw',
         description='#2 Bakers, bulk',
         active=True,
-        inventory_category='produce',
-        measure_unit='case',
-        house_order_items=[order_item2, order_item4],
+        measure_unit='pound',
+        house_order_items=[order_item2],
         house_inventory_items=[house_inventory_item2],
         vendor_items=[potato_vendor],
-        # default_vendor_item_id=,
+        default_vendor_item_id=None,
         storage_locations=[kitchen_dry_storage],
         item_class=produce
     )
@@ -289,7 +317,7 @@ def db_seed():
         delivery_days=['Thursday', 'Friday', 'Saturday'],
         vendor_items=[carrots_vendor1, potato_vendor],
         vendor_orders=[vendor_order1, vendor_order3],
-        vendor_invoices=[vendor_invoice1, vendor_invoice3]
+        vendor_invoices=[vendor_invoice1]
     )
     vendor2 = Vendor(
         name='Chef Store',
@@ -327,13 +355,11 @@ def db_seed():
     db.session.add(v_order_item1)
     db.session.add(v_order_item2)
     db.session.add(v_order_item3)
-    db.session.add(v_order_item4)
 
     # HOUSE_ORDER_ITEMS
     db.session.add(order_item1)
     db.session.add(order_item2)
     db.session.add(order_item3)
-    db.session.add(order_item4)
 
     # HOUSE_INVENTORY_ITEMS
     db.session.add(house_inventory_item1)
@@ -354,6 +380,11 @@ def db_seed():
     db.session.add(potato_vendor)
     db.session.add(carrots_vendor1)
     db.session.add(carrots_vendor2)
+
+    # VENDOR_INVOICE_ITEMS
+    db.session.add(vendor_inv_item1)
+    db.session.add(vendor_inv_item2)
+    db.session.add(vendor_inv_item3)
 
     # VENDOR_INVOICES
     db.session.add(vendor_invoice1)

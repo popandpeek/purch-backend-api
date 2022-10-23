@@ -1,4 +1,4 @@
-from flask import jsonify, Blueprint
+from flask import jsonify, Blueprint, json
 from sqlalchemy import DateTime, func
 from src.model import *
 from src.schema import *
@@ -10,10 +10,10 @@ blueprint_inventories = Blueprint('inventories_bp', __name__)
 @blueprint_inventories.route('/inventory/<int:inventory_id>', methods=['GET'])
 # @jwt_required()
 def house_inventory(inventory_id: int):
-    inventory = HouseInventory.query.filter_by(HouseInventory.id == inventory_id)
+    inventory = HouseInventory.query.filter(HouseInventory.id == inventory_id).first()
     if inventory:
-        result = HouseInventorySchema.dump(inventory)
-        return jsonify(result), 200
+        result = house_inventory_schema.dumps(inventory)
+        return jsonify(json.loads(result)), 200
     else:
         return jsonify('No inventory found'), 404
 
@@ -23,8 +23,8 @@ def house_inventory(inventory_id: int):
 def house_inventories():
     inventories = HouseInventory.query.order_by(HouseInventory.date).all()
     if inventories:
-        result = house_inventorys_schema.dump(inventories)
-        return jsonify(result), 200
+        result = house_inventorys_schema.dumps(inventories)
+        return jsonify(json.loads(result)), 200
     else:
         return jsonify('No inventories found.'), 404
 
@@ -33,10 +33,10 @@ def house_inventories():
 @blueprint_inventories.route('/inventory_items/<int:inventory_id>', methods=['GET'])
 # @jwt_required()
 def house_inventory_items(inventory_id: int):
-    inventory_items = HouseInventoryItem.query.filter_by(HouseInventoryItem.house_inventory_id == inventory_id).all()
+    inventory_items = HouseInventoryItem.query.filter(HouseInventoryItem.house_inventory_id == inventory_id).all()
     if inventory_items:
-        result = house_inventory_items_schema.dump(inventory_items)
-        return jsonify(result), 200
+        result = house_inventory_items_schema.dumps(inventory_items)
+        return jsonify(json.loads(result)), 200
     else:
         return jsonify('No inventory items found!'), 404
 
@@ -47,8 +47,8 @@ def active_inventory():
     inventory = HouseInventory.query.filter_by(HouseInventory.submitted is False).first()
     if inventory:
         item_list = HouseInventoryItem.query.filter_by(HouseInventoryItem.house_inventory_id == inventory.id).all()
-        result = house_inventory_items_schema.dump(item_list)
-        return jsonify(result), 200
+        result = house_inventory_items_schema.dumps(item_list)
+        return jsonify(json.loads(result)), 200
     else:
         # create new set of house_inventory_items from active house_items
         # set of house_items and set house_inventory_id as inventory_id
@@ -60,8 +60,8 @@ def active_inventory():
 
         db.session.commit()
         item_list = HouseInventoryItem.query.filter_by(HouseInventoryItem.house_inventory_id == inventory.id).all()
-        result = house_inventory_items_schema.dump(item_list)
-        return jsonify(result), 200
+        result = house_inventory_items_schema.dumps(item_list)
+        return jsonify(json.loads(result)), 200
 
 
 @blueprint_inventories.route('/inventory_item_price/<int:inventory_item_id>/<string:price>', methods=['PUT'])
