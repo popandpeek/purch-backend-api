@@ -1,4 +1,4 @@
-from src.extensions import db
+from extensions.database import db
 
 house_storage_association_table = db.Table('hs_st_assoc', db.Model.metadata,
                                            db.Column('house_item_id', db.ForeignKey('house_item.id'),
@@ -80,12 +80,13 @@ class HouseItem(db.Model):
     description = db.Column(db.String, nullable=True)
     active = db.Column(db.Boolean)
     measure_unit = db.Column(db.String, nullable=False)
+    cur_price = db.Column(db.String, nullable=True)
+    default_vendor_item_id = db.Column(db.Integer, nullable=True)
     item_class = db.relationship('ItemClassification', back_populates='house_items', cascade='all, delete',
                                  foreign_keys=[item_class_id])
     house_order_items = db.relationship('HouseOrderItem', back_populates='house_item', cascade='all, delete')
     house_inventory_items = db.relationship('HouseInventoryItem', back_populates='house_item', cascade='all, delete')
     vendor_items = db.relationship('VendorItem', back_populates='house_item', cascade='all, delete')
-    default_vendor_item_id = db.Column(db.Integer, nullable=True)
     storage_locations = db.relationship('StorageLocation', secondary=house_storage_association_table,
                                         back_populates='house_items', cascade='all, delete')
 

@@ -1,26 +1,25 @@
 import datetime
 
-from flask import request, jsonify, Blueprint
-from sqlalchemy import DateTime, func
-from src.model import *
+from extensions.api import Blueprint, SQLCursorPage
+from models.model import *
 
 
-blueprint_db = Blueprint('blueprint_db', __name__)
+blp = Blueprint('blueprint_db', __name__)
 
 
-@blueprint_db.cli.command('db_create')
+@blp.cli.command('db_create')
 def db_create():
     db.create_all()
     db.session.commit()
 
 
-@blueprint_db.cli.command('db_drop')
+@blp.cli.command('db_drop')
 def db_drop():
     db.drop_all()
     print("Database dropped.")
 
 
-@blueprint_db.cli.command('db_seed')
+@blp.cli.command('db_seed')
 def db_seed():
     # STORAGE LOCATIONS
     kitchen_line_refer = StorageLocation(
