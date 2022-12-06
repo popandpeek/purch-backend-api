@@ -5,17 +5,27 @@ from models.schema import VendorInvoiceSchema
 from extensions.database import db
 
 
-blp = Blueprint('house_invoices', __name__, url_prefix='/invoices', description='Operations on Vendor Invoices')
+blp = Blueprint('invoices', __name__, url_prefix='/invoices', description='Operations on Vendor Invoices')
+
+
+@blp.route('/')
+class VendorInvoicesAll(MethodView):
+    @blp.response(200, VendorInvoiceSchema(many=True))
+    def get(self):
+        """
+        Get all VendorInvoice's
+        """
+        return VendorInvoice.query.all()
 
 
 @blp.route('/<int:vendor_id>/<int:invoice_id>')
-class VendorInvoice(MethodView):
+class VendorInvoiceSingle(MethodView):
     @blp.response(200, VendorInvoiceSchema)
     def get(self, vendor_id, invoice_id):
         """
         Get VendorInvoice
         """
-        return VendorInvoice.get_or_404(invoice_id)
+        return VendorInvoice.query.get_or_404(invoice_id)
 
     @blp.etag
     @blp.arguments(VendorInvoiceSchema)
@@ -24,7 +34,7 @@ class VendorInvoice(MethodView):
         """
         Update VendorInvoice
         """
-        invoice = VendorInvoice.get_or_404(invoice_id)
+        invoice = VendorInvoice.query.get_or_404(invoice_id)
         blp.check_etag(invoice, VendorInvoiceSchema)
         VendorInvoiceSchema().update(invoice, update_data)
         db.session.add(invoice)

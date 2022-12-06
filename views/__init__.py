@@ -1,5 +1,4 @@
 """Modules initialization"""
-
 # from . import auth
 from . import db
 from . import house_items
@@ -10,8 +9,10 @@ from . import vendor_items
 from . import vendor_orders
 from . import vendors
 
+
 MODULES = (
     # auth,
+    db,
     house_items,
     house_orders,
     inventories,

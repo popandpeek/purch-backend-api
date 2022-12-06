@@ -1,30 +1,19 @@
 from extensions.database import *
 from models.model import *
-from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, fields
+from marshmallow_sqlalchemy import fields
 from marshmallow import EXCLUDE
+from extensions.api import AutoSchema
 
 
-class UserSchema(SQLAlchemyAutoSchema):
-    class Meta:
-        model = User
-        include_relationships = True
-        load_instance = True
+class UserSchema(AutoSchema):
+    class Meta(AutoSchema.Meta):
+        table = User.__table__
         unknown = EXCLUDE
 
-    def update(self, obj, data):
-        """Update object nullifying missing data"""
-        loadable_fields = [
-            k for k, v in self.fields.items() if not v.dump_only
-        ]
-        for name in loadable_fields:
-            setattr(obj, name, data.get(name))
 
-
-class VendorSchema(SQLAlchemyAutoSchema):
-    class Meta:
-        model = Vendor
-        include_relationships = True
-        load_instance = True
+class VendorSchema(AutoSchema):
+    class Meta(AutoSchema.Meta):
+        table = Vendor.__table__
         unknown = EXCLUDE
 
     vendor_items = fields.Nested('VendorItemSchema', many=True, exclude=('vendor', 'vendor_order_items',
@@ -34,39 +23,19 @@ class VendorSchema(SQLAlchemyAutoSchema):
     vendor_invoices = fields.Nested('VendorInvoiceSchema', many=True, exclude=('vendor', 'vendor_order',
                                                                                'vendor_invoice_items',))
 
-    def update(self, obj, data):
-        """Update object nullifying missing data"""
-        loadable_fields = [
-            k for k, v in self.fields.items() if not v.dump_only
-        ]
-        for name in loadable_fields:
-            setattr(obj, name, data.get(name))
 
-
-class ItemClassSchema(SQLAlchemyAutoSchema):
-    class Meta:
-        model = ItemClassification
-        include_relationships = True
-        load_instance = True
+class ItemClassSchema(AutoSchema):
+    class Meta(AutoSchema.Meta):
+        table = ItemClassification.__table__
         unknown = EXCLUDE
 
     house_items = fields.Nested('HouseItemSchema', many=True, exclude=('house_order_items', 'house_inventory_items',
                                                                        'vendor_items', 'item_class', 'storage_locations'))
 
-    def update(self, obj, data):
-        """Update object nullifying missing data"""
-        loadable_fields = [
-            k for k, v in self.fields.items() if not v.dump_only
-        ]
-        for name in loadable_fields:
-            setattr(obj, name, data.get(name))
 
-
-class VendorItemSchema(SQLAlchemyAutoSchema):
-    class Meta:
-        model = VendorItem
-        include_relationships = True
-        load_instance = True
+class VendorItemSchema(AutoSchema):
+    class Meta(AutoSchema.Meta):
+        table = VendorItem.__table__
         unknown = EXCLUDE
 
     vendor_order_items = fields.Nested('VendorOrderItemSchema', many=True, exclude=('vendor_item', 'house_order_item',
@@ -79,32 +48,14 @@ class VendorItemSchema(SQLAlchemyAutoSchema):
                                                                                         'vendor_order_item',
                                                                                         'vendor_item'))
 
-    def update(self, obj, data):
-        """Update object nullifying missing data"""
-        loadable_fields = [
-            k for k, v in self.fields.items() if not v.dump_only
-        ]
-        for name in loadable_fields:
-            setattr(obj, name, data.get(name))
 
-
-class StorageLocationSchema(SQLAlchemyAutoSchema):
-    class Meta:
-        model = StorageLocation
-        include_relationships = True
-        load_instance = True
+class StorageLocationSchema(AutoSchema):
+    class Meta(AutoSchema.Meta):
+        table = StorageLocation.__table__
         unknown = EXCLUDE
 
     house_items = fields.Nested('HouseItemSchema', many=True, exclude=('house_order_items', 'house_inventory_items',
                                                                        'vendor_items', 'storage_locations', 'item_class', ))
-
-    def update(self, obj, data):
-        """Update object nullifying missing data"""
-        loadable_fields = [
-            k for k, v in self.fields.items() if not v.dump_only
-        ]
-        for name in loadable_fields:
-            setattr(obj, name, data.get(name))
 
 
 class StorageLocationHouseItemSchema(ma.Schema):
@@ -117,21 +68,10 @@ class StorageLocationHouseItemSchema(ma.Schema):
     vendor_items = fields.Nested(VendorItemSchema, many=True, exclude=('vendor_order_items', 'vendor',
                                                                        'house_item', 'vendor_invoice_items'))
 
-    def update(self, obj, data):
-        """Update object nullifying missing data"""
-        loadable_fields = [
-            k for k, v in self.fields.items() if not v.dump_only
-        ]
-        for name in loadable_fields:
-            setattr(obj, name, data.get(name))
 
-
-class HouseItemSchema(SQLAlchemyAutoSchema):
-    class Meta:
-        model = HouseItem
-        include_relationships = True
-        load_instance = True
-        unknown = EXCLUDE
+class HouseItemSchema(AutoSchema):
+    class Meta(AutoSchema.Meta):
+        table = HouseItem.__table__
 
     item_class = fields.Nested(ItemClassSchema, exclude=('house_items',))
     house_order_items = fields.Nested('HouseOrderItemSchema', many=True, exclude=('vendor_order_item', 'house_item',
@@ -141,61 +81,32 @@ class HouseItemSchema(SQLAlchemyAutoSchema):
                                                                        'vendor_invoice_items',))
     storage_locations = fields.Nested(StorageLocationSchema, many=True, exclude=('house_items',))
 
-    def update(self, obj, data):
-        """Update object nullifying missing data"""
-        loadable_fields = [
-            k for k, v in self.fields.items() if not v.dump_only
-        ]
-        for name in loadable_fields:
-            setattr(obj, name, data.get(name))
 
-
-class HouseOrderSchema(SQLAlchemyAutoSchema):
-    class Meta:
-        model = HouseOrder
-        include_relationships = True
-        load_instance = True
+class HouseOrderSchema(AutoSchema):
+    class Meta(AutoSchema.Meta):
+        table = HouseOrder.__table__
         unknown = EXCLUDE
 
     house_order_items = fields.Nested('HouseOrderItemSchema', many=True, exclude=('house_order', 'house_item',
                                                                                   'vendor_order_item', ))
 
-    def update(self, obj, data):
-        """Update object nullifying missing data"""
-        loadable_fields = [
-            k for k, v in self.fields.items() if not v.dump_only
-        ]
-        for name in loadable_fields:
-            setattr(obj, name, data.get(name))
 
-
-class HouseOrderItemSchema(SQLAlchemyAutoSchema):
-    class Meta:
-        model = HouseOrderItem
-        include_relationships = True
-        load_instance = True
+class HouseOrderItemSchema(AutoSchema):
+    class Meta(AutoSchema.Meta):
+        table = HouseOrderItem.__table__
         unknown = EXCLUDE
 
-    house_order = fields.Nested(HouseOrderSchema, exclude=('house_order_items',))
+    house_order = fields.Nested(HouseOrderSchema, exclude=('house_order_items',), missing=None, allow_none=True)
     house_item = fields.Nested(HouseItemSchema, exclude=('house_order_items', 'house_inventory_items', 'vendor_items',
-                                                         'storage_locations'))
-    vendor_order_item = fields.Nested('VendorOrderItemSchema', exclude=('vendor_order', 'vendor_item', 'house_order_item',
-                                                                        'vendor_invoice_item',))
-
-    def update(self, obj, data):
-        """Update object nullifying missing data"""
-        loadable_fields = [
-            k for k, v in self.fields.items() if not v.dump_only
-        ]
-        for name in loadable_fields:
-            setattr(obj, name, data.get(name))
+                                                         'storage_locations'), missing=None, allow_none=True)
+    vendor_order_item = fields.Nested('VendorOrderItemSchema', exclude=('vendor_order', 'vendor_item',
+                                                                        'house_order_item', 'vendor_invoice_item',),
+                                      missing=None, allow_none=True)
 
 
-class VendorOrderSchema(SQLAlchemyAutoSchema):
-    class Meta:
-        model = VendorOrder
-        include_relationships = True
-        load_instance = True
+class VendorOrderSchema(AutoSchema):
+    class Meta(AutoSchema.Meta):
+        table = VendorOrder.__table__
         unknown = EXCLUDE
 
     vendor = fields.Nested(VendorSchema, exclude=('vendor_items', 'vendor_orders', 'vendor_invoices',))
@@ -204,20 +115,10 @@ class VendorOrderSchema(SQLAlchemyAutoSchema):
                                                                                     'vendor_invoice_item',
                                                                                     'house_order_item'))
 
-    def update(self, obj, data):
-        """Update object nullifying missing data"""
-        loadable_fields = [
-            k for k, v in self.fields.items() if not v.dump_only
-        ]
-        for name in loadable_fields:
-            setattr(obj, name, data.get(name))
 
-
-class VendorOrderItemSchema(SQLAlchemyAutoSchema):
-    class Meta:
-        model = VendorOrderItem
-        include_relationships = True
-        load_instance = True
+class VendorOrderItemSchema(AutoSchema):
+    class Meta(AutoSchema.Meta):
+        table = VendorOrderItem.__table__
         unknown = EXCLUDE
 
     vendor_item = fields.Nested(VendorItemSchema, exclude=('vendor_order_items', 'vendor', 'house_item',
@@ -227,20 +128,10 @@ class VendorOrderItemSchema(SQLAlchemyAutoSchema):
                                                                             'vendor_item',))
     house_order_item = fields.Nested(HouseOrderItemSchema, exclude=('house_order', 'house_item', 'vendor_order_item'))
 
-    def update(self, obj, data):
-        """Update object nullifying missing data"""
-        loadable_fields = [
-            k for k, v in self.fields.items() if not v.dump_only
-        ]
-        for name in loadable_fields:
-            setattr(obj, name, data.get(name))
 
-
-class VendorInvoiceSchema(SQLAlchemyAutoSchema):
-    class Meta:
-        model = VendorInvoice
-        include_relationships = True
-        load_instance = True
+class VendorInvoiceSchema(AutoSchema):
+    class Meta(AutoSchema.Meta):
+        table = VendorInvoice.__table__
         unknown = EXCLUDE
 
     vendor = fields.Nested(VendorSchema, exclude=('vendor_orders', 'vendor_invoices', 'vendor_items',))
@@ -249,20 +140,10 @@ class VendorInvoiceSchema(SQLAlchemyAutoSchema):
                                                                                         'vendor_order_item',
                                                                                         'vendor_item',))
 
-    def update(self, obj, data):
-        """Update object nullifying missing data"""
-        loadable_fields = [
-            k for k, v in self.fields.items() if not v.dump_only
-        ]
-        for name in loadable_fields:
-            setattr(obj, name, data.get(name))
 
-
-class VendorInvoiceItemSchema(SQLAlchemyAutoSchema):
-    class Meta:
-        model = VendorInvoiceItem
-        include_relationships = True
-        load_instance = True
+class VendorInvoiceItemSchema(AutoSchema):
+    class Meta(AutoSchema.Meta):
+        table = VendorInvoiceItem.__table__
         unknown = EXCLUDE
 
     vendor_invoice = fields.Nested(VendorInvoiceSchema, exclude=('vendor', 'vendor_order', 'vendor_invoice_items',))
@@ -271,51 +152,24 @@ class VendorInvoiceItemSchema(SQLAlchemyAutoSchema):
     vendor_item = fields.Nested(VendorItemSchema, exclude=('vendor_order_items', 'vendor', 'house_item',
                                                            'vendor_invoice_items',))
 
-    def update(self, obj, data):
-        """Update object nullifying missing data"""
-        loadable_fields = [
-            k for k, v in self.fields.items() if not v.dump_only
-        ]
-        for name in loadable_fields:
-            setattr(obj, name, data.get(name))
 
-
-class HouseInventorySchema(SQLAlchemyAutoSchema):
-    class Meta:
-        model = HouseInventory
-        include_relationships = True
-        load_instance = True
+class HouseInventorySchema(AutoSchema):
+    class Meta(AutoSchema.Meta):
+        table = HouseInventory.__table__
         unknown = EXCLUDE
 
     house_inventory_items = fields.Nested('HouseInventoryItemSchema', many=True, exclude=('house_item',
                                                                                           'house_inventory', ))
 
-    def update(self, obj, data):
-        """Update object nullifying missing data"""
-        loadable_fields = [
-            k for k, v in self.fields.items() if not v.dump_only
-        ]
-        for name in loadable_fields:
-            setattr(obj, name, data.get(name))
 
-
-class HouseInventoryItemSchema(SQLAlchemyAutoSchema):
-    class Meta:
-        model = HouseInventoryItem
-        include_relationships = True
-        load_instance = True
+class HouseInventoryItemSchema(AutoSchema):
+    class Meta(AutoSchema.Meta):
+        table = HouseInventoryItem.__table__
         unknown = EXCLUDE
 
-    house_item = fields.Nested(HouseItemSchema)
-    house_inventory = fields.Nested(HouseInventorySchema, exclude=('house_inventory_items',))
-
-    def update(self, obj, data):
-        """Update object nullifying missing data"""
-        loadable_fields = [
-            k for k, v in self.fields.items() if not v.dump_only
-        ]
-        for name in loadable_fields:
-            setattr(obj, name, data.get(name))
+    house_item = fields.Nested(HouseItemSchema, missing=None, allow_none=True)
+    house_inventory = fields.Nested(HouseInventorySchema, exclude=('house_inventory_items',),
+                                    missing=None, allow_none=True)
 
 
 # user_schema = UserSchema()

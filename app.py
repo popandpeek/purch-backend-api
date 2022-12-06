@@ -4,10 +4,13 @@ import warnings
 import extensions
 import views
 from config import config
+from flask_cors import CORS
+from werkzeug.routing import BaseConverter
 
 
 def create_app():
     app = Flask(__name__)
+    CORS(app)
     app.config.from_object(config)
     register_extensions(app)
     api = extensions.create_api(app)

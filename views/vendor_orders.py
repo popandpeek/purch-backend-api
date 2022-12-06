@@ -8,6 +8,16 @@ from extensions.database import db
 blp = Blueprint('vendor_orders', __name__, url_prefix='/vendor_orders', description='Operations on Vendor Orders')
 
 
+@blp.route('/')
+class VendorOrdersAll(MethodView):
+    @blp.response(200, VendorOrderSchema(many=True))
+    def get(self):
+        """
+        Get VendorOrder by vendor id
+        """
+        return VendorOrder.query.all()
+
+
 @blp.route('/<int:vendor_id>')
 class VendorOrders(MethodView):
     @blp.response(200, VendorOrderSchema)

@@ -8,6 +8,17 @@ from extensions.database import db
 blp = Blueprint('vendor_items', __name__, url_prefix='/vendor_items', description='Operations on Vendor Items')
 
 
+@blp.route('/')
+class VendorItemsAll(MethodView):
+    @blp.response(200, VendorItemSchema(many=True))
+    def get(self):
+        """
+        Get list of all VendorItem's by
+        """
+        items = VendorItem.query.all()
+        return items
+
+
 @blp.route('/<int:vendor_id>')
 class VendorItems(MethodView):
     @blp.response(200, VendorItemSchema(many=True))
@@ -15,7 +26,7 @@ class VendorItems(MethodView):
         """
         Get list of VendorItem's by vendor id
         """
-        vendor_items = VendorItem.query.filter(id=vendor_id).all()
+        vendor_items = VendorItem.query.filter_by(vendor_id)
         return vendor_items
 
     @blp.arguments(VendorItemSchema)
@@ -38,7 +49,7 @@ class VendorItems(MethodView):
         """
         vendor_item_id = update_data.pop('vendor_item_id', None)
         if vendor_item_id:
-            vendor_item = VendorItem.get_or_404(vendor_item_id)
+            vendor_item = VendorItem.query.get_or_404(vendor_item_id)
             blp.check_etag(vendor_item, VendorItemSchema)
             VendorItemSchema().update(vendor_item, update_data)
             db.session.add(vendor_item)

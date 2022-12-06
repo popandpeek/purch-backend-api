@@ -8,6 +8,7 @@ db = SQLAlchemy()  # pylint: disable=invalid-name
 ma = Marshmallow()
 migrate = Migrate()
 
+
 def init_app(app):
     """Initialize relational database extension"""
     db.init_app(app)
@@ -20,5 +21,4 @@ def init_app(app):
         with app.app_context():
             from sqlalchemy import event
             event.listen(db.engine, 'connect', _fk_pragma_on_connect)
-
-    db.create_all(app=app)
+            db.create_all()

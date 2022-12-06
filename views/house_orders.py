@@ -38,7 +38,7 @@ class HouseOrders(MethodView):
         """
         Updates HouseOrder
         """
-        order = HouseOrder.get_or_404(order_id)
+        order = HouseOrder.query.get_or_404(order_id)
         blp.check_etag(order, HouseOrderSchema)
         HouseOrderSchema().update(order, update_data)
         db.session.add(order)
@@ -80,24 +80,10 @@ class ActiveOrder(MethodView):
             db.session.commit()
             return order
 
-    @blp.etag
-    @blp.arguments(HouseOrderItemSchema)
-    @blp.response(200, HouseOrderItemSchema(many=True))
-    def put(self, new_item, item_id):
-        """
-        Updates HouseOrderItem
-        """
-        item = HouseOrderItem.query.get_or_404(item_id)
-        blp.check_etag(item, HouseOrderItemSchema)
-        HouseOrderItemSchema().update(item, new_item)
-        db.session.add(item)
-        db.session.commit()
-        return
-
 
 @blp.route('/active_order/<string:item_id>')
 class ActiveOrderItems(MethodView):
-    @blp.response(200, HouseOrderItemSchema())
+    @blp.response(200, HouseOrderItemSchema)
     def get(self, item_id):
         """
         Get HouseOrderItem from active order by HouseOrderItem id
@@ -105,16 +91,13 @@ class ActiveOrderItems(MethodView):
         item = HouseOrderItem.query.get_or_404(item_id)
         return item
 
-    @blp.etag
-    @blp.arguments(HouseOrderItemSchema)
-    @blp.response(200, HouseOrderItemSchema())
+    @blp.arguments(HouseOrderItemSchema, location='json')
+    @blp.response(200, HouseOrderItemSchema)
     def put(self, new_item, item_id):
         """
-        Updates HouseOrderItems
+        Updates HouseOrderItem
         """
         item = HouseOrderItem.query.get_or_404(item_id)
-        blp.check_etag(item, HouseOrderItemSchema)
         HouseOrderItemSchema().update(item, new_item)
-        db.session.add(item)
         db.session.commit()
         return item

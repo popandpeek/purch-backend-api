@@ -44,7 +44,7 @@ class HouseInventories(MethodView):
 
 
 @blp.route('/<int:inventory_id>')
-class HouseInventory(MethodView):
+class HouseInventorySingle(MethodView):
     @blp.response(200, HouseInventorySchema)
     def get(self, inventory_id):
         """
@@ -53,15 +53,14 @@ class HouseInventory(MethodView):
         inventory = HouseInventory.query.get_or_404(inventory_id)
         return inventory
 
-    @blp.etag
+
     @blp.arguments(HouseInventorySchema)
     @blp.response(200, HouseInventorySchema)
     def put(self, update_data, inventory_id):
         """
         Update HouseInventory by id
         """
-        inventory = HouseInventory.get_or_404(inventory_id)
-        blp.check_etag(inventory, HouseInventorySchema)
+        inventory = HouseInventory.query.get_or_404(inventory_id)
         HouseInventory().update(inventory, update_data)
         db.session.add(inventory)
         db.session.commit()
@@ -78,26 +77,24 @@ class HouseInventoryItems(MethodView):
         return inventory_items
 
 
-@blp.route('/inventory_item/<int:inventory_item_id>')
+@blp.route('/inventory_item/<string:inventory_item_id>')
 class InventoryItem(MethodView):
     @blp.response(200, HouseInventoryItemSchema)
     def get(self, inventory_item_id):
         """
         Get HouseInventoryItem by id
         """
-        return HouseInventoryItem.get_or_404(inventory_item_id)
+        return HouseInventoryItem.query.get_or_404(inventory_item_id)
 
-    @blp.etag
-    @blp.arguments(HouseInventoryItemSchema)
+    @blp.arguments(HouseInventoryItemSchema, location='json')
     @blp.response(200, HouseInventoryItemSchema)
-    def put(self, update_data, inventory_item_id):
+    def put(self, new_item, inventory_item_id):
         """
-        Update HouseInventoryItem
+        Updates HouseInventoryItem
         """
-        item = HouseOrderItem.get_or_404(inventory_item_id)
-        blp.check_etag(item, HouseInventoryItemSchema)
-        HouseInventoryItem().update(item, update_data)
-        db.session.add(item)
+        print(new_item)
+        item = HouseInventoryItem.query.get_or_404(inventory_item_id)
+        HouseInventoryItemSchema().update(item, new_item)
         db.session.commit()
         return item
 
