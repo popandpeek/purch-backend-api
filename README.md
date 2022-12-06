@@ -3,7 +3,7 @@ Basic API for a purchasing and inventory application.
 
 1. Update config.py for your database.
 
-2. Create tables -- > flask blueprint_db db_create
+2. Create tables --> flask blueprint_db db_create
 
 3. Initialize flask migrate --> flask db init
 
