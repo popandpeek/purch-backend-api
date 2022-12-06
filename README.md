@@ -1,7 +1,7 @@
 # purch-backend-api
 Basic API for a purchasing and inventory application.
 
-1. Update config.py and create your database.
+1. Update config.py for your database.
 
 2. Create tables -- > flask blueprint_db db_create
 
